@@ -8,20 +8,18 @@ class Day1 {
     fun part1() {
         val raw = readInputFileByLines("day1.txt")
         val elves = splitToElves(raw)
-        val fattest = elves.stream()
-                .map { it.sum() }
-                .max(Comparator.naturalOrder())
-        println(fattest.get())
+        val fattest = elves.maxOfOrNull { it.sum() }
+        println(fattest)
     }
 
     fun part2() {
         val raw = readInputFileByLines("day1.txt")
         val elves = splitToElves(raw)
-        val calories = elves.stream()
+        val top3 = elves
                 .map { it.sum() }
-                .sorted(reverseOrder())
-                .collect(Collectors.toList())
-        val top3 = calories.subList(0, 3).sum()
+                .sortedDescending()
+                .subList(0, 3)
+                .sum()
         println(top3)
     }
 }
