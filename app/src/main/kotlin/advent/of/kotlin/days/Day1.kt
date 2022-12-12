@@ -1,7 +1,6 @@
 package advent.of.kotlin.days
 
 import advent.of.kotlin.utils.readInputFileByLines
-import java.util.stream.Collector
 import java.util.stream.Collectors
 
 
