@@ -1,7 +1,6 @@
 package advent.of.kotlin.days
 
 import advent.of.kotlin.utils.readInputFileByLines
-import java.util.stream.Collectors
 
 
 class Day1 {
@@ -22,18 +21,18 @@ class Day1 {
             .sum()
         println(top3)
     }
-}
 
-fun splitToElves(raw: List<String>): List<List<Int>> {
-    val elves = mutableListOf<MutableList<Int>>()
-    var foods = mutableListOf<Int>()
-    for (s in raw) {
-        if (s == "") {
-            elves.add(foods)
-            foods = arrayListOf()
-            continue
+    private fun splitToElves(raw: List<String>): List<List<Int>> {
+        val elves = mutableListOf<MutableList<Int>>()
+        var foods = mutableListOf<Int>()
+        for (s in raw) {
+            if (s == "") {
+                elves.add(foods)
+                foods = arrayListOf()
+                continue
+            }
+            foods.add(s.toInt())
         }
-        foods.add(s.toInt())
+        return elves
     }
-    return elves
 }
