@@ -16,10 +16,10 @@ class Day1 {
         val raw = readInputFileByLines("day1.txt")
         val elves = splitToElves(raw)
         val top3 = elves
-                .map { it.sum() }
-                .sortedDescending()
-                .subList(0, 3)
-                .sum()
+            .map { it.sum() }
+            .sortedDescending()
+            .subList(0, 3)
+            .sum()
         println(top3)
     }
 }
