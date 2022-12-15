@@ -4,7 +4,7 @@ import advent.of.kotlin.utils.readInputFileByLines
 
 class Day4 {
     class ElfPair(s: String) {
-        val sections: Pair<Set<Int>, Set<Int>>
+        private val sections: Pair<Set<Int>, Set<Int>>
 
         init {
             val split = s.split(",")
