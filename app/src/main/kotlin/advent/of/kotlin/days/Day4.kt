@@ -52,5 +52,4 @@ class Day4 {
         println(total)
 
     }
-
 }
