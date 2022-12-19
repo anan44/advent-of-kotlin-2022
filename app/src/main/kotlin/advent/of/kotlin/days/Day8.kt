@@ -47,12 +47,48 @@ class Day8 {
             return false
         }
 
+        fun treesVisibleFrom(x: Int, y: Int): Int {
+            val self = trees[y][x]
+            val lineToLeftBorder = trees[y].subList(0, x).reversed()
+            val lineToRightBorder = trees[y].subList(x + 1, trees[y].size)
+            val lineToTopBorder = trees.map { it[x] }.subList(0, y).reversed()
+            val lineToBottomBorder = trees.map { it[x] }.subList(y + 1, trees.first().size)
+
+            return visibleFromList(self, lineToLeftBorder) * 
+                    visibleFromList(self, lineToRightBorder) *
+                    visibleFromList(self, lineToTopBorder) * 
+                    visibleFromList(self, lineToBottomBorder)
+        }
+        
+        fun highestScenicScore(): Int {
+            val yCoordinates = 0..trees.size.dec()
+            val xCoordinates = 0..trees.first().size.dec()
+            val coordinates = xCoordinates.flatMap { x -> yCoordinates.map { y -> Pair(x, y) } }
+            return coordinates
+                .map { treesVisibleFrom(it.first, it.second)}
+                .sortedDescending()
+                .first()
+        }
+
         fun countVisibleTrees(): Int {
             val yCoordinates = 0..trees.size.dec()
             val xCoordinates = 0..trees.first().size.dec()
             val coordinates = xCoordinates.flatMap { x -> yCoordinates.map { y -> Pair(x, y) } }
-            val isVisible = coordinates.count { isTreeVisible(it.second, it.first) }
+            val isVisible = coordinates.count { isTreeVisible(it.first, it.second) }
             return isVisible
+        }
+
+        fun visibleFromList(self: Int, row: List<Int>): Int {
+            var count = 0
+            for (x in row) {
+                if (x < self) {
+                    count += 1
+                    continue
+                }
+                count += 1
+                break
+            }
+            return count
         }
     }
 
@@ -68,5 +104,11 @@ class Day8 {
         val forest = parseForest(lines)
         val total = forest.countVisibleTrees()
         println(total)
+    }
+
+    fun part2() {
+        val lines = readInputFileByLines("day8.txt")
+        val forest = parseForest(lines)
+        println(forest.highestScenicScore())
     }
 }
