@@ -141,4 +141,22 @@ class Day7 {
             .sumOf { it.second }
         println(result)
     }
+
+    fun part2() {
+        val raw = readFileAsString("day7.txt")
+        val commands = parseCommands(raw)
+        val fileTree = buildFileTree(commands)
+        val folderSizes = calculateFolderSizes(fileTree)
+
+        val currentSize = fileTree.values.sum()
+        val fileSystemSize = 70000000
+        val spaceRequired = 30000000
+        val needToFree = spaceRequired - (fileSystemSize - currentSize)
+
+        val bigEnough = folderSizes
+            .map { it.second }
+            .sorted()
+            .first { it >= needToFree }
+        println(bigEnough)
+    }
 }
