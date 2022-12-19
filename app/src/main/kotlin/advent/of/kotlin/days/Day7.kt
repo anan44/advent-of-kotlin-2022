@@ -43,7 +43,6 @@ class Day7 {
         }
     }
 
-
     private fun stringToFSElem(s: String): FSElem {
         val split = s.split(" ")
         return if (split[0] == "dir") {
@@ -74,7 +73,6 @@ class Day7 {
             }
             .toList()
     }
-
 
     private fun buildFileTree(commands: List<Command>): Map<String, Int> {
         var pwd = "/"
