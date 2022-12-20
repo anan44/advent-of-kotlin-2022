@@ -28,13 +28,13 @@ class Day9 {
     private fun parseSteps(lines: List<String>) =
         lines.flatMap { lineToSteps(it) }
     
-    fun needsToMove(self: PosXY, head: PosXY): Boolean {
+    private fun needsToMove(self: PosXY, head: PosXY): Boolean {
         val xDist = abs(self.first - head.first)
         val yDist = abs(self.second - head.second)
         return xDist > 1 || yDist > 1
     }
 
-    fun move(self: PosXY, head: PosXY): PosXY {
+    private fun move(self: PosXY, head: PosXY): PosXY {
         if (!needsToMove(self, head)) {
             return self
         }
@@ -55,7 +55,7 @@ class Day9 {
         }
     }
 
-    fun move(self: PosXY, step: Step): PosXY {
+    private fun move(self: PosXY, step: Step): PosXY {
         return when (step) {
             Step.LEFT -> PosXY(self.first - 1, self.second)
             Step.RIGHT -> PosXY(self.first + 1, self.second)
@@ -68,7 +68,7 @@ class Day9 {
         }
     }
     
-    fun moveWithTail(steps: List<Step>): Int {
+    private fun moveWithTail(steps: List<Step>): Int {
         var head = PosXY(0, 0)
         var tail = PosXY(0, 0)
         val unique = mutableSetOf<PosXY>()
@@ -79,10 +79,30 @@ class Day9 {
         }
         return unique.size
     }
-
+    
+    private fun moveWithNineTails(steps: List<Step>): Int {
+        val parts = (1..10).map { PosXY(0,0) }.toMutableList()
+        val unique = mutableSetOf<PosXY>()
+        steps.forEach { step ->
+            parts[0] = move(parts[0], step)
+            (1..9).forEach {
+                parts[it] = move(parts[it], parts[it - 1])
+            }
+            unique.add(parts[9])
+        }
+        return unique.size
+    }
+    
     fun part1() {
         val lines = readInputFileByLines("day9.txt")
         val steps = parseSteps(lines)
         println(moveWithTail(steps))
+    }
+    
+    fun part2() {
+        val lines = readInputFileByLines("day9.txt")
+        val steps = parseSteps(lines)
+        println(moveWithNineTails(steps))
+        
     }
 }
