@@ -1,7 +1,7 @@
 package advent.of.kotlin
 
-import advent.of.kotlin.days.Day9
+import advent.of.kotlin.days.Day10
 
 fun main() {
-    Day9().part2()
+    Day10().part1()
 }
