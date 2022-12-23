@@ -8,9 +8,9 @@ const val startHeight = 0
 const val endHeight = 27
 
 class Day12 {
+    data class Path(val head: XY, val tail: Set<XY>)
 
-
-    class Mountain(val heights: List<List<Int>>) {
+    class Mountain(private val heights: List<List<Int>>) {
         private fun getHeight(pos: XY): Int {
             return heights[pos.second][pos.first]
         }
@@ -47,7 +47,7 @@ class Day12 {
             }
         }
 
-        fun findStart(): XY {
+        private fun findStart(): XY {
             for (y in 0..heights.size.dec()) {
                 for (x in 0..heights.first().size.dec()) {
                     if (getHeight(XY(x, y)) == 0) {
@@ -56,6 +56,37 @@ class Day12 {
                 }
             }
             throw Exception("No start")
+        }
+
+        fun process() {
+            val visited = mutableSetOf<XY>()
+            var paths = listOf(Path(findStart(), setOf()))
+            while (true) {
+                val temp = mutableListOf<Path>()
+                for (p in paths) {
+                    val newMoves = possibleMoves(p.head)
+                        .filter { it !in visited }
+                        .map { Path(it, p.tail + p.head) }
+                    
+
+                    newMoves.forEach { visited.add(it.head) }
+                    temp.addAll(newMoves)
+                }
+
+                val end = paths.find { getHeight(it.head) == endHeight }
+                if (end != null) {
+                    println("FOUND")
+                    println(end.tail.size)
+                    break
+                }
+
+                if (paths.isEmpty()) {
+                    println("FUG")
+                    break
+                }
+                
+                paths = temp
+            }
         }
     }
 
@@ -72,9 +103,8 @@ class Day12 {
     }
 
     fun part1() {
-        val lines = readInputFileByLines("trial.txt")
+        val lines = readInputFileByLines("day12.txt")
         val mountain = parseMountain(lines)
-        val start = mountain.findStart()
-        println(mountain.possibleMoves(start))
+        mountain.process()
     }
 }
