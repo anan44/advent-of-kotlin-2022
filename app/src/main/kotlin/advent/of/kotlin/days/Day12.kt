@@ -21,7 +21,7 @@ class Day12 {
                 XY(self.first, self.second.dec()), // Up
                 XY(self.first, self.second.inc()), // Down
                 XY(self.first.dec(), self.second), // Left
-                XY(self.first.inc(), self.second),  // Right
+                XY(self.first.inc(), self.second), // Right
             )
 
             return directions.mapNotNull { moveOrNil(selfHeight, it) }
