@@ -58,7 +58,7 @@ class Day12 {
             throw Exception("No start")
         }
 
-        fun process(start: XY) {
+        fun process(start: XY): Int {
             val visited = mutableSetOf<XY>()
             var paths = listOf(Path(start, setOf()))
             while (true) {
@@ -67,7 +67,7 @@ class Day12 {
                     val newMoves = possibleMoves(p.head)
                         .filter { it !in visited }
                         .map { Path(it, p.tail + p.head) }
-                    
+
 
                     newMoves.forEach { visited.add(it.head) }
                     temp.addAll(newMoves)
@@ -75,18 +75,27 @@ class Day12 {
 
                 val end = paths.find { getHeight(it.head) == endHeight }
                 if (end != null) {
-                    println("FOUND")
-                    println(end.tail.size)
-                    break
+                    return end.tail.size
                 }
 
                 if (paths.isEmpty()) {
-                    println("FUG")
-                    break
+                    return -1
                 }
-                
+
                 paths = temp
             }
+        }
+
+        fun findWithHeight(height: Int): List<XY> {
+            val positions = mutableListOf<XY>()
+            for (y in 0..heights.size.dec()) {
+                for (x in 0..heights.first().size.dec()) {
+                    if (getHeight(XY(x, y)) == height) {
+                        positions.add(XY(x, y))
+                    }
+                }
+            }
+            return positions
         }
     }
 
@@ -107,5 +116,16 @@ class Day12 {
         val mountain = parseMountain(lines)
         val start = mountain.findStart()
         mountain.process(start)
+    }
+
+    fun part2() {
+        val lines = readInputFileByLines("day12.txt")
+        val mountain = parseMountain(lines)
+        val starts = mountain.findWithHeight(1)
+        val distances = starts.map { mountain.process(it) }
+        val shortestDistance = distances
+            .filter { it > 0 }
+            .minOf { it }
+        println(shortestDistance)
     }
 }
