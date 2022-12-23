@@ -47,7 +47,7 @@ class Day12 {
             }
         }
 
-        private fun findStart(): XY {
+        fun findStart(): XY {
             for (y in 0..heights.size.dec()) {
                 for (x in 0..heights.first().size.dec()) {
                     if (getHeight(XY(x, y)) == 0) {
@@ -58,9 +58,9 @@ class Day12 {
             throw Exception("No start")
         }
 
-        fun process() {
+        fun process(start: XY) {
             val visited = mutableSetOf<XY>()
-            var paths = listOf(Path(findStart(), setOf()))
+            var paths = listOf(Path(start, setOf()))
             while (true) {
                 val temp = mutableListOf<Path>()
                 for (p in paths) {
@@ -105,6 +105,7 @@ class Day12 {
     fun part1() {
         val lines = readInputFileByLines("day12.txt")
         val mountain = parseMountain(lines)
-        mountain.process()
+        val start = mountain.findStart()
+        mountain.process(start)
     }
 }
