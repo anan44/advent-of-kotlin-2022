@@ -14,7 +14,7 @@ class Day13 {
 
     class Vec(val x: List<Value>) : Value() {
         override fun toString(): String {
-            return "\n($x)"
+            return "$x"
         }
     }
     
@@ -22,19 +22,25 @@ class Day13 {
         var idx = 1
         private var nestCount = 1
         private val vec = mutableListOf<Value>()
-        fun process(): Vec {
+        fun process(): Pair<Vec, Int> {
             when {
                 s[idx] == '[' -> {
                     nestCount++
                     val nc = Cursor(s.substring(idx..(s.length - 2)))
-                    nc.process()
+                    val helper = nc.process()
+                    vec.add(helper.first)
+                    idx += helper.second.dec()
                 }
                 s[idx] == ']' -> {
                     nestCount--
                     if (nestCount == 0) {
-                        println("THING")
-                        return Vec(vec)
+                        return Pair(Vec(vec), idx)
                     }
+                }
+                s[idx].isDigit() && s[idx.inc()].isDigit() -> {
+                    val twoDigitNum = "${s[idx].digitToInt()}${s[idx.inc()].digitToInt()}".toInt()
+                    vec.add(Number(twoDigitNum))
+                    idx++
                 }
                 s[idx].isDigit() -> {
                     vec.add(Number(s[idx].digitToInt()))
@@ -46,10 +52,10 @@ class Day13 {
     }
 
     fun part1() {
-        // val lines = readInputFileByLines("trial.txt")
+        val lines = readInputFileByLines("trial.txt")
         val practice = "[3,[10,5],[8,6]]"
-        val cursor = Cursor(practice)
-        println(cursor.process())
+        val list = Cursor(practice).process().first
+        println(list.x)
         
     }
 }
