@@ -4,33 +4,22 @@ import advent.of.kotlin.utils.readFileAsString
 
 class Day13 {
 
-    open class Value {
-        fun compare(comp: Value): Boolean {
-            if (this is Number && comp is Number) {
-                return  this.x <= comp.x
-            }
-
-            if (this is Vec && comp is Number) {
-                val wrapped = Vec(listOf(comp))
-                return this.compare(wrapped)
-            }
-
-            if (this is Number && comp is Vec) {
-                val wrapped = Vec(listOf(this))
-                return wrapped.compare(comp)
-            }
-
-            if (this is Vec && comp is Vec) {
-                return this.compare(comp)
-            }
-            
-            throw Exception("Never")
-        }
+    enum class Order {
+        YES, NO, EVEN
     }
 
+    fun boolToOrder(b: Boolean): Order {
+        return if (b) Order.YES else Order.NO
+    }
+
+    open class Value
     class Number(val x: Int) : Value() {
         override fun toString(): String {
             return x.toString()
+        }
+
+        fun toVec(): Vec {
+            return Vec(listOf(this))
         }
     }
 
@@ -45,43 +34,6 @@ class Day13 {
 
         fun rest(): Vec {
             return Vec(x.drop(1))
-        }
-
-        fun compare(comp: Vec): Boolean {
-            if (this.x.isEmpty()) {
-                return true
-            }
-            
-            if (comp.x.isEmpty()) {
-                return false
-            }
-            
-            val thisHead = this.head()
-            val compHead = comp.head()
-            if (thisHead is Number && compHead is Number) {
-                if (thisHead.x < compHead.x) {
-                    return true
-                }
-                if (thisHead.x > compHead.x) {
-                    return false
-                }
-                
-                return thisHead.x == compHead.x && 
-                        this.rest().compare(comp.rest())
-            }
-            
-            if (thisHead is Vec && compHead is Number) {
-                val wrapped = Vec(listOf(compHead))
-                return thisHead.compare(wrapped)
-            }
-            
-            if (thisHead is Number && compHead is Vec) {
-                val wrapped = Vec(listOf(thisHead))
-                return wrapped.compare(compHead)
-            }
-
-            return thisHead.compare(compHead) &&
-                    this.rest().compare(comp.rest())
         }
     }
 
@@ -121,27 +73,101 @@ class Day13 {
         }
     }
 
-    fun parsePacketPairs(raw: String): List<Pair<Vec, Vec>> {
+    fun parsePacketPairs(raw: String): List<Pair<Value, Value>> {
         val twoLines = raw.split("\n\n").map { it.split("\n") }
         return twoLines.map {
             Pair(
-                Vec(Cursor(it[0]).process().first.x),
-                Vec(Cursor(it[1]).process().first.x),
+                Vec(Cursor(it[0]).process().first.x) as Value,
+                Vec(Cursor(it[1]).process().first.x) as Value,
             )
         }
     }
 
+    private fun vecToVecIsInOrder(v1: Vec, v2: Vec): Order {
+        return when {
+            v1.x.isEmpty() && v2.x.isNotEmpty() -> Order.YES
+            v1.x.isNotEmpty() && v2.x.isEmpty() -> Order.NO
+            v1.x.isEmpty() && v2.x.isEmpty() -> Order.EVEN
+            v1.x.isNotEmpty() && v2.x.isNotEmpty() -> {
+                val headPair = Pair(v1.head(), v2.head())
+                val headsInOrder = isInOrder(headPair)
+                when (headsInOrder) {
+                    Order.EVEN -> isInOrder(Pair(v1.rest(), v2.rest()))
+                    Order.YES -> Order.YES
+                    Order.NO -> Order.NO
+                }
+            }
+
+            else -> throw Exception("Never")
+        }
+    }
+
+    private fun isInOrder(pair: Pair<Value, Value>): Order {
+        val (v1, v2) = pair
+        val result = when {
+            v1 is Number && v2 is Number -> {
+                if (v1.x == v2.x) Order.EVEN else boolToOrder(v1.x < v2.x)
+            }
+
+            v1 is Vec && v2 is Vec -> {
+                vecToVecIsInOrder(v1, v2)
+            }
+
+            v1 is Vec && v2 is Number -> vecToVecIsInOrder(v1, v2.toVec())
+            v1 is Number && v2 is Vec -> vecToVecIsInOrder(v1.toVec(), v2)
+            else -> throw Exception("Never")
+        }
+
+        return result
+    }
 
     fun part1() {
-        val raw = readFileAsString("trial.txt")
+        val raw = readFileAsString("day13.txt")
         val pairs = parsePacketPairs(raw)
 
         val result = pairs
-            .map { it.first.compare(it.second) }
+            .map { isInOrder(it) }
             .withIndex()
-            .filter { it.value }
+            .toList()
+            .filter { it.value == Order.YES || it.value == Order.EVEN }
             .map { it.index.inc() }
+            .sum()
 
         println(result)
+    }
+
+    fun compare(v1: Value, v2: Value): Boolean {
+
+        return true
+    }
+
+    fun part2() {
+        val raw = readFileAsString("day13.txt")
+        val pairs = parsePacketPairs(raw)
+        
+        val divider1 = Vec(Cursor("[[2]]").process().first.x) as Value
+        val divider2 = Vec(Cursor("[[6]]").process().first.x) as Value
+
+        val allPackets = pairs
+            .flatMap { listOf(it.first, it.second) }
+            .toMutableList()
+        
+        allPackets.add(divider1)
+        allPackets.add(divider2)
+
+        val sortedPackets = allPackets.sortedWith { a, b ->
+            when (isInOrder(Pair(a, b))) {
+                Order.YES -> -1
+                Order.NO -> 1
+                Order.EVEN -> 0
+            }
+        }
+
+        val result = sortedPackets
+            .withIndex()
+            .filter { it.value == divider1 || it.value == divider2 }
+            .map  {it.index.inc()}
+        
+        println(result[0] * result[1])
     }
 }
